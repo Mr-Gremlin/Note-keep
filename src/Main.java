@@ -8,21 +8,23 @@
         notes alphabetically.
 */
 
+import java.io.File;
+
 public class Main {
 
     /**
-     * Method of pure convenience to implement print without the need for the System class path.
+     * Method of pure convenience to call print() without the need for the System class path.
      * @param text - string to print
      */
-    public static void print(String text)  {
+    private static void print(String text)  {
         System.out.print(text);
     }
 
     /**
-     * Method of pure convenience to implement println without the need for the System class path.
+     * Method of pure convenience to call println() without the need for the System class path.
      * @param text - string to print
      */
-    public static void println(String text)  {
+    private static void println(String text)  {
         System.out.println(text);
     }
 
@@ -30,7 +32,7 @@ public class Main {
      * Prints specified number of blank lines.
      * @param number_of_lines - desired number of blank lines
      */
-    public static void lnbreak(int number_of_lines){
+    private static void lnbreak(int number_of_lines){
         for (int i = 1; i <= number_of_lines;i++){
             print("\n");
         }
@@ -39,11 +41,25 @@ public class Main {
 //----------------------------------------------------------------------------------------------------------------------
 
     public static void main(String[] args) {
+
         String progName = "------------ Note-Keep ------------";
         //Display Program Name
         println(progName);
-        print("___________");
-        //Check for existing notes file. Load or make if needed.
+
+        //Initialises notesdb object for read/write.
+        File notesdb = new File("src", "notesdb.txt");
+
+        try {
+            //Checks for existing notes data and loads it. If not found, creates it.
+            if (notesdb.createNewFile()) {
+                println("No existing data file found...\nNew data file created.");
+            } else {
+                println("Data file found.");
+            }
+        }
+        catch (Exception e){
+            println("Error loading/creating data file. Notes may not save.");
+        }
 
         /*MENUS
 
