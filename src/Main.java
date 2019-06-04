@@ -86,26 +86,12 @@ public class Main {
             println("Error loading/creating data file. Notes may not save.");
         }
 
-        //HASHMAP GENERATED FROM NOTES DATA. USE SCANNER.
+        //Create arraylist to store notes here.
 
         while(true) {
             Menus.Top();
         }
 
-        /*MENUS
-
-        TOP New Note; Browse Notes; Find note; Exit
-
-            New Note -> Title -> Content -> Display it - Save/Edit/Clear and Cancel
-
-            Browse Notes -> Alphabetically by Title; By Date; By Size -> Displays 10 at a time ->
-            Modify Note; Next 10; Return to menu
-            Modify Note - Export;Edit;Delete;Return
-
-            Find -> Search by name or by date; Return to menu -> Displays matching, or failed search prompt
-            Failed Search -> Search by name or by date; Return to menu...
-            Displays Matching - Export/Edit/Delete/Return to find tool
-         */
     }
 
         //METHOD - Load/Save notes
