@@ -9,6 +9,7 @@
 */
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -64,9 +65,11 @@ public class Main {
 
 //----------------------------------------------------------------------------------------------------------------------
 
+    static ArrayList<Note> notesList = new ArrayList<>();
+
     public static void main(String[] args) {
 
-        String progName = "\n------------ Note-Keep ------------\n";
+        String progName = "\n---------------------- Note-Keep ----------------------\n";
         //Display Program Name
         println(progName);
 
@@ -83,10 +86,13 @@ public class Main {
             }
         }
         catch (Exception e){
-            println("Error loading/creating data file. Notes may not save.");
+            println("Error loading/creating data file.\n" +
+                    "Please ensure existing data file is not in use and that root directory has write permissions.\n" +
+                    "Program will exit.");
+            System.exit(-1);
         }
 
-        //Create arraylist to store notes here.
+
 
         while(true) {
             Menus.Top();
@@ -94,6 +100,67 @@ public class Main {
 
     }
 
+    static void newNote(){
+
+        Note aNote = null;
+        String tempTitle;
+        String tempContent;
+        boolean shouldCont = false;
+
+        print("Note Title: ");
+        tempTitle = getuserInput();
+        lnbreak(1);
+
+        do {
+            println(tempTitle + "... Is this correct? [Y/N]");
+            switch (yesNo(getuserInput())) {
+                case 1:
+                    aNote = new Note(tempTitle);
+                    shouldCont = true;
+                    break;
+                case 0:
+                    println("Retype your title.");
+                    print("Note Title: ");
+                    tempTitle = getuserInput();
+                    lnbreak(1);
+                    shouldCont = false;
+                    break;
+                case -1:
+                    println("Invalid response. Please enter [Y/N]...");
+                    shouldCont = false;
+            }
+        }while(!shouldCont);
+
+        print("Enter Content: ");
+        tempContent = getuserInput();
+        lnbreak(1);
+
+
+        println("Note Preview");
+        println("------------");
+
+        aNote.setContent(tempContent);
+        for(String s: aNote.view()){
+            println(s);
+        }
+        notesList.add(aNote);
+    }
+
+    /**
+     *Simple user validation check for prompts.
+     * @param userInput - Expects 'Y' or 'N'
+     * @return - 1 for yes, 0 for no, -1 for invalid input
+     */
+    static int yesNo(String userInput){
+        userInput = userInput.strip().toLowerCase();
+        if(userInput.charAt(0)=='y'){
+            return 1;
+        }else if(userInput.charAt(0)=='n'){
+            return 0;
+        }else{
+            return -1;
+        }
+    }
         //METHOD - Load/Save notes
 
         //METHOD - Export a note to defined location (as .txt)

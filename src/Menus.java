@@ -17,7 +17,7 @@ class Menus extends Main{
             option = selector(getuserInput(), Options);
             switch (option) {
                 case 0:
-                    println(Options[option]);
+                    newNote();
                     validSelection = true;
                     break;
                 case 1:
@@ -77,7 +77,7 @@ class Menus extends Main{
 
             New Note -> Title -> Content -> Display it - Save/Edit/Clear and Cancel
 
-            Browse Notes -> Alphabetically by Title; By Date; By Size -> Displays 10 at a time ->
+            Browse Notes -> Alphabetically by Title; By Date -> Displays 10 at a time ->
             Modify Note; Next 10; Return to menu
             Modify Note - Export;Edit;Delete;Return
 
@@ -91,7 +91,7 @@ class Menus extends Main{
         //Prints the Menu header and underlines it to make it distinct from the options.
         println("\n"+menu);
         for(int i=0; i < menu.length(); i++){
-            print("-");
+            print("=");
         }
         lnbreak(1);
         //Prints numbered options of the menu.
