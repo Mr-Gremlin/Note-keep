@@ -9,14 +9,38 @@
 */
 
 import java.io.File;
+import java.util.Scanner;
 
 public class Main {
+
+    /**
+     * Reads user input from System. Utilises regex to ensure that the input doesn't consist solely of whitespace.
+     * Prompts user for a 'valid' entry if this is the case.
+     * @return - String of user input.
+     */
+    static String getuserInput() {
+
+        Scanner input = new Scanner(System.in);
+        String userinput;
+
+        while(true) {
+            userinput = input.nextLine();
+            if (userinput.matches("\\s*\\S+.*")) {
+                break;
+            } else {
+                println("Please enter valid input...");
+            }
+        }
+
+        input = null;
+        return userinput;
+    }
 
     /**
      * Method of pure convenience to call print() without the need for the System class path.
      * @param text - string to print
      */
-    private static void print(String text)  {
+    static void print(Object text)  {
         System.out.print(text);
     }
 
@@ -24,7 +48,7 @@ public class Main {
      * Method of pure convenience to call println() without the need for the System class path.
      * @param text - string to print
      */
-    private static void println(String text)  {
+    static void println(Object text)  {
         System.out.println(text);
     }
 
@@ -32,7 +56,7 @@ public class Main {
      * Prints specified number of blank lines.
      * @param number_of_lines - desired number of blank lines
      */
-    private static void lnbreak(int number_of_lines){
+    static void lnbreak(int number_of_lines){
         for (int i = 1; i <= number_of_lines;i++){
             print("\n");
         }
@@ -42,15 +66,16 @@ public class Main {
 
     public static void main(String[] args) {
 
-        String progName = "------------ Note-Keep ------------";
+        String progName = "\n------------ Note-Keep ------------\n";
         //Display Program Name
         println(progName);
+
 
         //Initialises notesdb object for read/write.
         File notesdb = new File("src", "notesdb.txt");
 
         try {
-            //Checks for existing notes data and loads it. If not found, creates it.
+            //Checks for existing notes data. If not found, creates it.
             if (notesdb.createNewFile()) {
                 println("No existing data file found...\nNew data file created.");
             } else {
@@ -59,6 +84,12 @@ public class Main {
         }
         catch (Exception e){
             println("Error loading/creating data file. Notes may not save.");
+        }
+
+        //HASHMAP GENERATED FROM NOTES DATA. USE SCANNER.
+
+        while(true) {
+            Menus.Top();
         }
 
         /*MENUS
