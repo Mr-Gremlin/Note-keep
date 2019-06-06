@@ -18,10 +18,10 @@ import java.util.Scanner;
 public class Main {
 
     //Container for active Note objects.
-    static List<Note> notesList = new ArrayList<>();
+    private static List<Note> notesList = new ArrayList<>();
 
     //Initialises notesdb object for read/write.
-    static File notesdb = new File("src", "notesdb.txt");
+    private static File notesdb = new File("src", "notesdb.txt");
 
 
     public static void main(String[] args) {
@@ -35,7 +35,7 @@ public class Main {
 
         if(nameLine.length()!=typeWidth){nameLine += "-";}
 
-        System.out.println(nameLine.length());
+        lnbreak(1);
         println(nameLine);
 
         try {
@@ -65,14 +65,14 @@ public class Main {
     //-- General Utility----------------------------------------------------------------------------------------------------
 
     //Defines maximum spread of displayed text in the console.
-    static int typeWidth = 60;
+    private static int typeWidth = 80;
 
     /**
      * Reads user input from System. Utilises regex to ensure that the input doesn't consist solely of whitespace.
      * Prompts user for a 'valid' entry if this is the case.
      * @return - String of user input.
      */
-    static String getuserInput() {
+    private static String getuserInput() {
 
         Scanner input = new Scanner(System.in);
         String userinput;
@@ -96,7 +96,7 @@ public class Main {
      * @param text - string to print
      */
     @SuppressWarnings("Duplicates")
-    static void print(String text)  {
+    private static void print(String text)  {
 
         if(text.length()<typeWidth){
             System.out.print(text);
@@ -151,7 +151,7 @@ public class Main {
      * @param text - string to print
      */
     @SuppressWarnings("Duplicates")
-    static void println(String text)  {
+    private static void println(String text)  {
         if(text.length()<typeWidth){
             System.out.println(text);
         }
@@ -203,7 +203,7 @@ public class Main {
      * Prints specified number of blank lines.
      * @param number_of_lines - desired number of blank lines
      */
-    static void lnbreak(int number_of_lines){
+    private static void lnbreak(int number_of_lines){
         for (int i = 1; i <= number_of_lines; i++) {
             print("\n");
         }
@@ -212,7 +212,7 @@ public class Main {
     /**
      * Prints a line separator that fills the allocated typeWidth.
      */
-    static void lnFill(String fill, int length){
+    private static void lnFill(String fill, int length){
         if((length == 0)||length>typeWidth){length = typeWidth;}
         for (int i = 1; i <= length; i++) {
             print(fill);
@@ -223,7 +223,7 @@ public class Main {
 
 //----------------------------------------------------------------------------------------------------------------------
 
-    static void newNote(){
+    private static void newNote(){
 
         Note aNote = null;
         String tempTitle;
@@ -274,7 +274,7 @@ public class Main {
      * @param userInput - Expects 'Y' or 'N'
      * @return - 1 for yes, 0 for no, -1 for invalid input
      */
-    static int yesNo(String userInput){
+    private static int yesNo(String userInput){
         userInput = userInput.strip().toLowerCase();
         if(userInput.charAt(0)=='y'){
             return 1;
@@ -285,7 +285,7 @@ public class Main {
         }
     }
 
-    static void loadNotes(){
+    private static void loadNotes(){
        try {
            Scanner scan = new Scanner(notesdb);
            List<String> unparsedNotes = new ArrayList<>();
@@ -306,7 +306,7 @@ public class Main {
        }
     }
 
-    static void saveExit(){
+    private static void saveExit(){
         BufferedWriter noteWriter;
         try {
             //Attempts to initialise a FileWriter object to write to the data file.
@@ -346,18 +346,14 @@ public class Main {
 
     }
 
-        //METHOD - Export a note to defined location (as .txt)
-
-        //METHOD - Escape dialogue
-
 //-- Menus + Related Methods--------------------------------------------------------------------------------------------
 
     private static String mName;
     private static int option;
 
-    static void Top(){
+    private static void Top(){
         mName = "Main Menu";
-        String[] Options = {"New Note","Browse Notes","Find Note","Exit"};
+        String[] Options = {"New Note","Browse Notes","Exit"};
 
         printMenu(mName,Options);
 
@@ -373,28 +369,236 @@ public class Main {
                     validSelection = true;
                     break;
                 case 1: //Browse
-                    println(Options[option]);
-                    for(Note note:notesList){
-                        lnFill("=",0);
-                        String[] noteInfo = note.view();
-                        String noteHeader = noteInfo[0]+" - "+noteInfo[1];
-                        println(noteHeader);
-                        lnFill("+",noteHeader.length());
-                        println(noteInfo[2]);
-                    }
+                    Browse();
                     validSelection = true;
                     break;
-                case 2: //Find
-                    println(Options[option]);
-                    validSelection = true;
-                    break;
-                case 3: //Exit
+                case 2: //Exit
                     saveExit();
                 case -1: //Invalid input, request valid input.
                     validSelection = false;
                     println("Invalid selection, please enter selection carefully.");
             }
         }while(!validSelection);
+    }
+
+    private static void Browse(){
+        mName = "Browse Notes";
+        String[] Options = {"Show Notes Alphabetically","Show Notes By Most Recent","Return"};
+
+        printMenu(mName,Options);
+
+        //Calls for user input and evaluates against available options.
+        boolean validSelection = false;
+        do {
+            print("Selection: ");
+            option = selector(getuserInput(), Options);
+            switch (option) {
+                case 0: //By lexicographic order
+                    Note.sortbyName(notesList);
+                    peruseEdit();
+                    validSelection = true;
+                    break;
+                case 1: //By date
+                    Note.sortbyDateTime(notesList);
+                    peruseEdit();
+                    validSelection = true;
+                    break;
+                case 2: //Return (To main menu)
+                    validSelection = true;
+                    break;
+                case -1: //Invalid input, request valid input.
+                    println("Invalid selection, please enter selection carefully.");
+            }
+        }while(!validSelection);
+    }
+
+    private static void peruseEdit(){
+
+        mName = "Peruse/Edit";
+        String[] Options = {"Show More","Show Previous","Edit/Delete","Return"};
+        List<Note> toView = new ArrayList<>();
+        boolean escapeDialogue = false;
+
+        int rootindex = 0;
+        int maxShown = 5;
+        boolean atStart;
+        boolean atEnd;
+
+
+        print("Displaying first "+maxShown+" notes");
+        try {
+            for(int i = 0; i < 3; i++){
+                Thread.sleep(300);
+                print(".");
+            }
+        }
+        catch(Exception Interrupt) {
+            println("{Error implementing pause...}");
+        }
+
+        do {
+            //noinspection
+            if(!toView.isEmpty()) {
+                toView.clear();
+            }
+            for(int aNote=rootindex; aNote < Math.min(notesList.size(), rootindex+maxShown);aNote++){
+                toView.add(notesList.get(aNote));
+            }
+
+            lnbreak(2);
+            //Formats and displays current selection of notes.
+            int selectionNumber = 0;
+            for(Note note:toView){
+
+                //Provides a numeric reference for currently visible notes
+                selectionNumber++;
+                print(selectionNumber+"# ");
+                lnFill("-",typeWidth-3);
+                lnbreak(1);
+
+                String[] noteInfo = note.view();
+
+                //Prints Note Header comprised of Title and DateTime
+                String noteHeader = noteInfo[0]+" || "+noteInfo[1];
+                println(noteHeader);
+                lnFill("+",noteHeader.length());
+
+                //Prints Content
+                println(noteInfo[2]);
+                lnbreak(1);
+            }
+
+            //Checks if current display group is at the start or end of the arrayList.
+            if(rootindex<maxShown){
+                atStart = true;
+            }else{
+                atStart = false;
+            }
+            if(rootindex>=notesList.size()-maxShown){
+                atEnd = true;
+            }else{
+                atEnd = false;
+            }
+
+            //Displays peruseEdit menu and prompts for user input.
+            printMenu(mName,Options);
+            print("Selection: ");
+
+            option = selector(getuserInput(), Options);
+            switch (option) {
+                case 0: //Show More
+                    if(atEnd) {
+                        println("No more notes held. Choose another option.");
+                    }else {
+                        rootindex += maxShown;
+                    }
+                    break;
+                case 1: //Show Previous
+                    if(atStart) {
+                        println("There are no notes prior to those currently displayed. Choose another option.");
+                    }else {
+                        rootindex -= maxShown;
+                    }
+
+                    break;
+
+                case 2: //Edit/Delete
+
+                    //Loads title of visible notes into an array
+                    String[] availableNotes = new String[maxShown];
+                    int loadTitle = 0;
+                    for(Note note: toView){
+                        availableNotes[loadTitle]=note.getTitle();
+                        loadTitle++;
+                    }
+                    print("Choose a currently displayed note (by number or title): ");
+                    int viewIndex;
+                    int noteIndex;
+
+                    //Identifies viewNote index of user selection, then finds its equivalent index for notesList.
+                    viewIndex = selector(getuserInput(), availableNotes);
+                    if (-1 != viewIndex && viewIndex < maxShown){
+                        noteIndex = viewIndex+rootindex;
+                    }else{
+                        println("Invalid Selection... operation cancelled.");
+                        break;
+                    }
+
+                    String selectedTitle = toView.get(viewIndex).getTitle();
+
+                    String[] subOptions = {"Edit","Delete","Cancel"};
+                    printMenu(selectedTitle,subOptions);
+                    print("Selection: ");
+
+
+                    boolean editComplete = false;
+                    do {
+                        int subOption = selector(getuserInput(), subOptions);
+                        boolean validResponse = false;
+                        switch (subOption) {
+                            case 0: //EDIT
+                                println("Enter new content for '" + selectedTitle + "': ");
+                                String newCont = getuserInput();
+
+                                do {
+                                    println("Are you sure you wish to change the content in '" + selectedTitle + "'? [Y/N]");
+                                    switch (yesNo(getuserInput())) {
+                                        case 1:
+                                            //SETS NEW CONTENT TO SELECTED NOTE
+                                            toView.get(viewIndex).setContent(newCont);
+                                            validResponse = true;
+                                            break;
+                                        case 0:
+                                            println("Operation Cancelled.");
+                                            validResponse = true;
+                                            break;
+                                        case -1:
+                                            println("Invalid response. Please enter [Y/N]...");
+                                    }
+                                } while (!validResponse);
+                                editComplete = true;
+                                break;
+                            case 1: //DELETE
+                                do {
+                                    println("Are you sure you wish to delete '" + selectedTitle + "'? [Y/N]");
+                                    switch (yesNo(getuserInput())) {
+                                        case 1:
+                                            //ERASES NOTE OBJECT FROM RUNTIME.
+                                            //THIS IS PERMANENT SO LONG AS THE PROGRAM EXITS CORRECTLY.
+                                            toView.set(viewIndex, null);
+                                            toView.remove(viewIndex);
+                                            notesList.set(noteIndex, null);
+                                            notesList.remove(noteIndex);
+                                            validResponse = true;
+                                            break;
+                                        case 0:
+
+                                            validResponse = true;
+                                            break;
+                                        case -1:
+                                            println("Invalid response. Please enter [Y/N]...");
+                                    }
+                                } while (!validResponse);
+                                editComplete = true;
+                                break;
+                            case 2: //Cancel
+                                println("Cancelled.");
+                                editComplete = true;
+                                break;
+                            case -1:
+                                println("Invalid selection.");
+                        }
+                    }while(!editComplete);
+
+
+                case 3: //Return (To main menu)
+                    escapeDialogue = true;
+                    break;
+                case -1: //Invalid input, request valid input.
+
+                    println("Invalid selection, please enter selection carefully.");
+            }
+        }while(!escapeDialogue);
     }
 
     private static int selector(String userInput, String[] options){
@@ -422,29 +626,6 @@ public class Main {
         //If no option is identified.
         return optionIdentified;
     }
-
-    static void Browse(){
-        mName = "Browse Notes";
-        String[] Options = {"Alphabetically","By Date","By size","Return"};
-
-        printMenu(mName,Options);
-
-    }
-
-    /*MENUS
-
-        TOP New Note; Browse Notes; Find note; Exit
-
-            New Note -> Title -> Content -> Display it - Save/Edit/Clear and Cancel
-
-            Browse Notes -> Alphabetically by Title; By Date -> Displays 10 at a time ->
-            Modify Note; Next 10; Return to menu
-            Modify Note - Export;Edit;Delete;Return
-
-            Find -> Search by name or by date; Return to menu -> Displays matching, or failed search prompt
-            Failed Search -> Search by name or by date; Return to menu...
-            Displays Matching - Export/Edit/Delete/Return to find tool
-         */
 
     private static void printMenu(String menu, String[] options){
 

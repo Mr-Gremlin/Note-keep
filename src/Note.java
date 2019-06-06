@@ -69,7 +69,7 @@ public class Note{
     use cases.
 */
 
-    public static void sortByName(List<Note> listOfNotes){
+    public static void sortbyName(List<Note> listOfNotes){
         listOfNotes.sort(new Comparator<Note>() {
             @Override
             public int compare(Note o1, Note o2) {
@@ -78,11 +78,11 @@ public class Note{
         });
     }
 
-    public static void sortByDate(List<Note> listOfNotes){
+    public static void sortbyDateTime(List<Note> listOfNotes){
         listOfNotes.sort(new Comparator<Note>() {
             @Override
             public int compare(Note o1, Note o2) {
-                return o1.getDateTime().compareTo(o2.getDateTime());
+                return -(o1.getDateTime().compareTo(o2.getDateTime()));
             }
         });
     }
